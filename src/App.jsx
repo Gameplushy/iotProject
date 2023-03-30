@@ -39,6 +39,9 @@ function App() {
     "Y":"-.--",
     "Z":"--.."
   }
+  const MORSEDOT = 100
+  const MORSEDASH = 300
+  const MORSEBREAK = 100
 
   function ConnectToBluetooth(){
     if (!('bluetooth' in navigator)) {
@@ -133,12 +136,11 @@ function Connect() {
         var code = morseDic[c]
         code.split('').forEach(d=>{
           var line = j+" "+timer;
-          timer += d=='.'?300:700;
+          timer += d=='.'?MORSEDOT:MORSEDASH;
           line+=" "+timer+"\r\n"
-          timer+=100;
+          timer+=MORSEBREAK;
           commands+=line
         })
-        timer+=200
       }
       commands = commands.substring(0,commands.length-2)
       MorseFlash(commands)
