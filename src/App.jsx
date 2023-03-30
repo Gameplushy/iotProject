@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import { Buffer } from 'buffer'
 
 function App() {
   const [script, setScript] = useState("")
@@ -19,10 +20,15 @@ function App() {
   }
 
   function Connect() {
-    navigator.bluetooth.requestDevice({ filters: [{ name: 'ESP32test'/*, optionalServices: ['30feff57-779d-4db7-8de8-1cf71542b3f7'] */ }] })
+    navigator.bluetooth.requestDevice({ filters: [{ name: 'ESP_group_666' }], optionalServices: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b", "beb5483e-36e1-4688-b7f5-ea07361b26a8"] })
       .then(function (device) {
         console.log(device.gatt)
-        setBluetoothDevice(device.gatt.connect());
+        /*setBluetoothDevice(*/device.gatt.connect()
+          .then(async (res) => {
+            return await res?.getPrimaryService("4fafc201-1fb5-459e-8fcc-c5c9c331914b")
+          }).then(async (res) => {
+            return await res?.getCharacteristic("beb5483e-36e1-4688-b7f5-ea07361b26a8")
+          }).then(res => setBluetoothDevice(res));
       })
       .catch((err) => {
         console.log('an error occured : ' + err.message)
@@ -92,9 +98,11 @@ function App() {
     Flash()
     Gantt()
     //ENVOYER ONELINE
-    const service = await bluetoothDevice.getPrimaryService("30feff57-779d-4db7-8de8-1cf71542b3f7")
-    const characteristic = await service.getCharacteristic("30feff57-779d-4db7-8de8-1cf71542b3f7")
-    characteristic.writeValue()
+    console.log(bluetoothDevice)
+    /*const service = await bluetoothDevice?.getPrimaryService("4fafc201-1fb5-459e-8fcc-c5c9c331914b")
+    const characteristic = await service.getCharacteristic("beb5483e-36e1-4688-b7f5-ea07361b26a8")*/
+    console.log(Buffer.from(oneline, 'utf-8'))
+    bluetoothDevice.writeValue(Buffer.from(oneline, 'utf-8'))
   }
 
   function Flash() {
