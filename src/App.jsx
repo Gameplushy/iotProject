@@ -63,10 +63,23 @@ function Connect() {
 // }
 
   function SendScript(){
-    if(!bluetoothDevice){
-      alert("No Bluetooth device connected")
+    // if(!bluetoothDevice){
+    //   alert("No Bluetooth device connected")
+    //   return;
+    // }
+    //script.match(/(([1-3]O([n]|f{2}))|(SLEEP(\d+)))/gim)
+    if(!script)
+      return;
+    console.log(script)
+    var verif = script.match(/^(([1-3] (ON( \d*)?|OFF))|(SLEEP \d+))$/gim)
+    var size = script.split(/\r\n|\r|\n/)
+    if(!verif || verif.length != size.length){
+      alert("Bad parsing")
       return;
     }
+
+    console.log(script.match(/^(([1-3] (ON( \d*)?|OFF))|(SLEEP \d+))$/gim).length)
+    console.log(script.split(/\r\n|\r|\n/).length)
   }
 
   return (
