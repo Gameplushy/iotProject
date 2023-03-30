@@ -108,11 +108,12 @@ function Connect() {
     var commands = script.split(/\r\n|\r|\n/)
     var endTime = Math.max(...commands.map(t=>parseInt(t.split(" ")[2])))
     commands.forEach(cmd => {
+      var value = {top: 0, left: 0, size: 0};
       cmd = cmd.split(" ")
-      var top = ((cmd[0])-1)*33
-      var left = Math.floor(((cmd[1])/endTime)*100)
-      var size = Math.floor(((cmd[2]-cmd[1])/endTime)*100)
-      var value = "{top : "+top+"%; left : "+left+"%; width : "+size+"%}"
+      value.top = ((cmd[0])-1)*(100/3)
+      value.left = (((cmd[1])/endTime)*100)
+      value.size = (((cmd[2]-cmd[1])/endTime)*100)
+      //var value = "{top : "+top+"%; left : "+left+"%; width : "+size+"%}"
       setSpans(ganttSpans=>[...ganttSpans,value])
     })
   }
@@ -127,7 +128,7 @@ function Connect() {
         <span className={"led "+ledToggler3}>3</span>
       </div>
       <div id="ganttContainer">
-        {ganttSpans.map(s=>{<span className='ganttBar' style={s}></span>})}
+        {ganttSpans.length!=0 ? ganttSpans.map(s=><span className='ganttBar' style={{'top': s.top+'%', 'left': s.left+'%', 'width': s.size+'%'}}></span>) : ""}
       </div>
       <div><button onClick={SendScript}>Send</button></div>
     </div>
