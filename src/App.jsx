@@ -9,9 +9,9 @@ function App() {
   const [ledToggler2, toggleLed2] = useState("")
   const [ledToggler3, toggleLed3] = useState("")
 
-  const [ganttSpans,setSpans] = useState([])
+  const [ganttSpans, setSpans] = useState([])
 
-  function ConnectToBluetooth(){
+  function ConnectToBluetooth() {
     if (!('bluetooth' in navigator)) {
       $target.innerText = 'Bluetooth API not supported.';
       return;
@@ -23,12 +23,8 @@ function App() {
     navigator.bluetooth.requestDevice({ filters: [{ name: 'ESP_group_666' }], optionalServices: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b", "beb5483e-36e1-4688-b7f5-ea07361b26a8"] })
       .then(function (device) {
         console.log(device.gatt)
-        /*setBluetoothDevice(*/device.gatt.connect()
-          .then(async (res) => {
-            return await res?.getPrimaryService("4fafc201-1fb5-459e-8fcc-c5c9c331914b")
-          }).then(async (res) => {
-            return await res?.getCharacteristic("beb5483e-36e1-4688-b7f5-ea07361b26a8")
-          }).then(res => setBluetoothDevice(res));
+        device.gatt.connect()
+          .then(res => setBluetoothDevice(res));
       })
       .catch((err) => {
         console.log('an error occured : ' + err.message)
@@ -89,20 +85,24 @@ function App() {
       alert("Bad parsing. Each line must be \"[LED ID] [START TIME] [END TIME]\"")
       return;
     }
-    if(size.length>50){
+    if (size.length > 50) {
       alert("Max limit hit (50)")
       return;
     }
-    var oneline = script.replaceAll(/\r\n|\r|\n/g,";")
+    var oneline = script.replaceAll(/\r\n|\r|\n/g, ";")
     console.log(oneline)
     Flash()
     Gantt()
     //ENVOYER ONELINE
     console.log(bluetoothDevice)
-    /*const service = await bluetoothDevice?.getPrimaryService("4fafc201-1fb5-459e-8fcc-c5c9c331914b")
-    const characteristic = await service.getCharacteristic("beb5483e-36e1-4688-b7f5-ea07361b26a8")*/
-    console.log(Buffer.from(oneline, 'utf-8'))
-    bluetoothDevice.writeValue(Buffer.from(oneline, 'utf-8'))
+    await bluetoothDevice?.getPrimaryService("4fafc201-1fb5-459e-8fcc-c5c9c331914b")
+      .then(async (res) => {
+        return await res?.getCharacteristic("beb5483e-36e1-4688-b7f5-ea07361b26a8")
+      }).then((res) => {
+        res.writeValue(Buffer.from(oneline, 'utf-8'))
+      })
+    /*console.log(Buffer.from(oneline, 'utf-8'))
+    bluetoothDevice.writeValue(Buffer.from(oneline, 'utf-8'))*/
   }
 
   function Flash() {
@@ -122,18 +122,18 @@ function App() {
     })
   }
 
-  function Gantt(){
+  function Gantt() {
     setSpans([])
     var commands = script.split(/\r\n|\r|\n/)
-    var endTime = Math.max(...commands.map(t=>parseInt(t.split(" ")[2])))
+    var endTime = Math.max(...commands.map(t => parseInt(t.split(" ")[2])))
     commands.forEach(cmd => {
-      var value = {top: 0, left: 0, size: 0};
+      var value = { top: 0, left: 0, size: 0 };
       cmd = cmd.split(" ")
-      value.top = ((cmd[0])-1)*(100/3)
-      value.left = (((cmd[1])/endTime)*100)
-      value.size = (((cmd[2]-cmd[1])/endTime)*100)
+      value.top = ((cmd[0]) - 1) * (100 / 3)
+      value.left = (((cmd[1]) / endTime) * 100)
+      value.size = (((cmd[2] - cmd[1]) / endTime) * 100)
       //var value = "{top : "+top+"%; left : "+left+"%; width : "+size+"%}"
-      setSpans(ganttSpans=>[...ganttSpans,value])
+      setSpans(ganttSpans => [...ganttSpans, value])
     })
   }
 
@@ -147,7 +147,7 @@ function App() {
         <span className={"led " + ledToggler3}>3</span>
       </div>
       <div id="ganttContainer">
-        {ganttSpans.length!=0 ? ganttSpans.map(s=><span className='ganttBar' style={{'top': s.top+'%', 'left': s.left+'%', 'width': s.size+'%'}}></span>) : ""}
+        {ganttSpans.length != 0 ? ganttSpans.map(s => <span className='ganttBar' style={{ 'top': s.top + '%', 'left': s.left + '%', 'width': s.size + '%' }}></span>) : ""}
       </div>
       <div><button onClick={SendScript}>Send</button></div>
     </div>
