@@ -87,12 +87,16 @@ function Connect() {
 
   function Flash(){
     var flashFunctions = [toggleLed1,toggleLed2,toggleLed3]
+    var numberOfFlashAsks = [0,0,0]
     script.split(/\r\n|\r|\n/).forEach(flash=>{
       var flashArray = flash.split(" ");
+      flashArray[0] = flashArray[0]-1
       setTimeout(() => {
-        flashFunctions[flashArray[0]-1]("ledon");
+        numberOfFlashAsks[flashArray[0]]++
+        if(numberOfFlashAsks[flashArray[0]]==1)flashFunctions[flashArray[0]]("ledon");
         setTimeout(() => {
-          flashFunctions[flashArray[0]-1]("");
+          numberOfFlashAsks[flashArray[0]]--
+          if(numberOfFlashAsks[flashArray[0]]==0)flashFunctions[flashArray[0]]("");
         }, flashArray[2]-flashArray[1]);
       }, flashArray[1]);
     })
