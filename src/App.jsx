@@ -71,15 +71,15 @@ function Connect() {
     if(!script)
       return;
     console.log(script)
-    var verif = script.match(/^(([1-3] (ON( \d*)?|OFF))|(SLEEP \d+))$/gim)
+    var verif = script.match(/^[1-3] \d+ \d+$/gim)
     var size = script.split(/\r\n|\r|\n/)
     if(!verif || verif.length != size.length){
       alert("Bad parsing")
       return;
     }
-
-    console.log(script.match(/^(([1-3] (ON( \d*)?|OFF))|(SLEEP \d+))$/gim).length)
-    console.log(script.split(/\r\n|\r|\n/).length)
+    var oneline = script.replace(/\r\n|\r|\n/,";")
+    console.log(oneline)
+    //ENVOYER ONELINE
   }
 
   return (
