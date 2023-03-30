@@ -57,21 +57,42 @@ button:focus-visible {
 }
 
 .led{
-  background-color: black;
+  background-color: rgb(102,55,37);
   display: inline-block;
   text-align: center;
   border-radius: 100%;
+  border : .7em solid black;
   width: 10em;
-  height: 100%;
+  height:100%
 }
 
 .ledon{
-  background-color: yellow;
+  background-color: rgb(255,223,77);
 }
 
 #ledrow{
   height: 10em;
   display: inline-block;
-  margin: 0 auto;
+  margin: 2em;
   align-content: center;
+}
+
+#ganttContainer{
+  width: 100%;
+  position: relative;
+  border: 1px solid black;
+  height: 10em ; 
+  background-color: beige;
+  text-align: left;
+}
+
+.ganttBar{
+  border: 1px solid black;
+  background-color: cornflowerblue;
+  position: absolute;
+  /*top: 0;
+  left: 0;
+  width: 20%;*/
+  height: 33%;
+  display: inline-block;
 }

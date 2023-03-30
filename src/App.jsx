@@ -8,6 +8,8 @@ function App() {
   const [ledToggler2,toggleLed2] = useState("")
   const [ledToggler3,toggleLed3] = useState("")
 
+  const [ganttSpans,setSpans] = useState([])
+
   function ConnectToBluetooth(){
     if (!('bluetooth' in navigator)) {
       $target.innerText = 'Bluetooth API not supported.';
@@ -17,7 +19,7 @@ function App() {
   }
 
 function Connect() {
-  navigator.bluetooth.requestDevice({filters :[{name : 'Decathlon Dual HR', services : ['00002a37-0000-1000-8000-00805f9b34fb']}]})
+  navigator.bluetooth.requestDevice({filters :[{name : 'ESP32test'/*, services : ['00002a37-0000-1000-8000-00805f9b34fb']*/}]})
     .then(function (device) {
       console.log(device.gatt)
       setBlueetoothDevice(device.gatt.connect());
@@ -72,7 +74,6 @@ function Connect() {
     // }
     if(!script)
       return;
-    console.log(script)
     var verif = script.match(/^[1-3] \d+ \d+$/gim)
     var size = script.split(/\r\n|\r|\n/)
     if(!verif || verif.length != size.length){
@@ -80,8 +81,8 @@ function Connect() {
       return;
     }
     var oneline = script.replaceAll(/\r\n|\r|\n/g,";")
-    console.log(oneline)
     Flash()
+    Gantt()
     //ENVOYER ONELINE
   }
 
@@ -102,6 +103,21 @@ function Connect() {
     })
   }
 
+  function Gantt(){
+    setSpans([])
+    var commands = script.split(/\r\n|\r|\n/)
+    var endTime = Math.max(...commands.map(t=>parseInt(t.split(" ")[2])))
+    commands.forEach(cmd => {
+      var value = {top: 0, left: 0, size: 0};
+      cmd = cmd.split(" ")
+      value.top = ((cmd[0])-1)*(100/3)
+      value.left = (((cmd[1])/endTime)*100)
+      value.size = (((cmd[2]-cmd[1])/endTime)*100)
+      //var value = "{top : "+top+"%; left : "+left+"%; width : "+size+"%}"
+      setSpans(ganttSpans=>[...ganttSpans,value])
+    })
+  }
+
   return (
     <div className="App">
       <div><button onClick={ConnectToBluetooth}>Connect to Bluetooth</button></div>
@@ -110,6 +126,9 @@ function Connect() {
         <span className={"led "+ledToggler1}>1</span>
         <span className={"led "+ledToggler2}>2</span>
         <span className={"led "+ledToggler3}>3</span>
+      </div>
+      <div id="ganttContainer">
+        {ganttSpans.length!=0 ? ganttSpans.map(s=><span className='ganttBar' style={{'top': s.top+'%', 'left': s.left+'%', 'width': s.size+'%'}}></span>) : ""}
       </div>
       <div><button onClick={SendScript}>Send</button></div>
     </div>
