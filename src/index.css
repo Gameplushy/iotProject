@@ -75,3 +75,22 @@ button:focus-visible {
   margin: 0 auto;
   align-content: center;
 }
+
+#ganttContainer{
+  width: 100%;
+  border: 1px solid black;
+  height: 10em ; 
+  background-color: beige;
+  text-align: left;
+}
+
+.ganttBar{
+  border: 1px solid black;
+  background-color: cornflowerblue;
+  position: relative;
+  /*top: 0;
+  left: 0;
+  width: 20%;*/
+  height: 33%;
+  display: inline-block;
+}
