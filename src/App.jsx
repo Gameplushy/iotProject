@@ -4,9 +4,9 @@ import './App.css'
 function App() {
   const [script, setScript] = useState("")
   const [bluetoothDevice, setBluetoothDevice] = useState(null)
-  const [ledToggler1,toggleLed1] = useState("")
-  const [ledToggler2,toggleLed2] = useState("")
-  const [ledToggler3,toggleLed3] = useState("")
+  const [ledToggler1, toggleLed1] = useState("")
+  const [ledToggler2, toggleLed2] = useState("")
+  const [ledToggler3, toggleLed3] = useState("")
 
   const [ganttSpans,setSpans] = useState([])
 
@@ -18,12 +18,15 @@ function App() {
     Connect();
   }
 
-function Connect() {
-  navigator.bluetooth.requestDevice({filters :[{name : 'ESP32test'/*, services : ['00002a37-0000-1000-8000-00805f9b34fb']*/}]})
-    .then(function (device) {
-      console.log(device.gatt)
-      setBlueetoothDevice(device.gatt.connect());
-    })
+  function Connect() {
+    navigator.bluetooth.requestDevice({ filters: [{ name: 'ESP32test'/*, optionalServices: ['30feff57-779d-4db7-8de8-1cf71542b3f7'] */ }] })
+      .then(function (device) {
+        console.log(device.gatt)
+        setBluetoothDevice(device.gatt.connect());
+      })
+      .catch((err) => {
+        console.log('an error occured : ' + err.message)
+      })
     // .then(function (server) {
     //   console.log(server)
     //   return server.getPrimaryService('00002a37-0000-1000-8000-00805f9b34fb');
@@ -44,39 +47,39 @@ function Connect() {
     //   //   changeRes("")
     //   // }, 3000);
     // });
-}
+  }
 
-// // A function that will be called once got characteristics
-// function gotCharacteristics(error, characteristics) {
-//   if (error || !characteristics){
-//     console.log("error: ", error);
-//     return;
-//   } 
-//   console.log("characteristics: ", characteristics);
-//   myCharacteristic = characteristics['4af9208bab88'];
-//   // Read the value of the first characteristic
-//   myBLE.read(myCharacteristic, gotValue);
-// }
+  // // A function that will be called once got characteristics
+  // function gotCharacteristics(error, characteristics) {
+  //   if (error || !characteristics){
+  //     console.log("error: ", error);
+  //     return;
+  //   } 
+  //   console.log("characteristics: ", characteristics);
+  //   myCharacteristic = characteristics['4af9208bab88'];
+  //   // Read the value of the first characteristic
+  //   myBLE.read(myCharacteristic, gotValue);
+  // }
 
-// // A function that will be called once got values
-// function gotValue(error, value) {
-//   if (error) console.log("error: ", error);
-//   console.log("value: ", value);
-//   myValue = value;
-//   // After getting a value, call p5ble.read() again to get the value again
-//   myBLE.read(myCharacteristic, gotValue);
-// }
+  // // A function that will be called once got values
+  // function gotValue(error, value) {
+  //   if (error) console.log("error: ", error);
+  //   console.log("value: ", value);
+  //   myValue = value;
+  //   // After getting a value, call p5ble.read() again to get the value again
+  //   myBLE.read(myCharacteristic, gotValue);
+  // }
 
-  function SendScript(){
-    // if(!bluetoothDevice){
-    //   alert("No Bluetooth device connected")
-    //   return;
-    // }
-    if(!script)
+  async function SendScript() {
+    if (!bluetoothDevice) {
+      alert("No Bluetooth device connected")
+      return;
+    }
+    if (!script)
       return;
     var verif = script.match(/^[1-3] \d+ \d+$/gim)
     var size = script.split(/\r\n|\r|\n/)
-    if(!verif || verif.length != size.length){
+    if (!verif || verif.length != size.length) {
       alert("Bad parsing. Each line must be \"[LED ID] [START TIME] [END TIME]\"")
       return;
     }
@@ -85,24 +88,28 @@ function Connect() {
       return;
     }
     var oneline = script.replaceAll(/\r\n|\r|\n/g,";")
+    console.log(oneline)
     Flash()
     Gantt()
     //ENVOYER ONELINE
+    const service = await bluetoothDevice.getPrimaryService("30feff57-779d-4db7-8de8-1cf71542b3f7")
+    const characteristic = await service.getCharacteristic("30feff57-779d-4db7-8de8-1cf71542b3f7")
+    characteristic.writeValue()
   }
 
-  function Flash(){
-    var flashFunctions = [toggleLed1,toggleLed2,toggleLed3]
-    var numberOfFlashAsks = [0,0,0]
-    script.split(/\r\n|\r|\n/).forEach(flash=>{
+  function Flash() {
+    var flashFunctions = [toggleLed1, toggleLed2, toggleLed3]
+    var numberOfFlashAsks = [0, 0, 0]
+    script.split(/\r\n|\r|\n/).forEach(flash => {
       var flashArray = flash.split(" ");
-      flashArray[0] = flashArray[0]-1
+      flashArray[0] = flashArray[0] - 1
       setTimeout(() => {
         numberOfFlashAsks[flashArray[0]]++
-        if(numberOfFlashAsks[flashArray[0]]==1)flashFunctions[flashArray[0]]("ledon");
+        if (numberOfFlashAsks[flashArray[0]] == 1) flashFunctions[flashArray[0]]("ledon");
         setTimeout(() => {
           numberOfFlashAsks[flashArray[0]]--
-          if(numberOfFlashAsks[flashArray[0]]==0)flashFunctions[flashArray[0]]("");
-        }, flashArray[2]-flashArray[1]);
+          if (numberOfFlashAsks[flashArray[0]] == 0) flashFunctions[flashArray[0]]("");
+        }, flashArray[2] - flashArray[1]);
       }, flashArray[1]);
     })
   }
@@ -125,11 +132,11 @@ function Connect() {
   return (
     <div className="App">
       <div><button onClick={ConnectToBluetooth}>Connect to Bluetooth</button></div>
-      <div><textarea value={script} onChange={e=>setScript(e.target.value)} cols="20" rows="20"></textarea></div>
+      <div><textarea value={script} onChange={e => setScript(e.target.value)} cols="20" rows="20"></textarea></div>
       <div id="ledrow">
-        <span className={"led "+ledToggler1}>1</span>
-        <span className={"led "+ledToggler2}>2</span>
-        <span className={"led "+ledToggler3}>3</span>
+        <span className={"led " + ledToggler1}>1</span>
+        <span className={"led " + ledToggler2}>2</span>
+        <span className={"led " + ledToggler3}>3</span>
       </div>
       <div id="ganttContainer">
         {ganttSpans.length!=0 ? ganttSpans.map(s=><span className='ganttBar' style={{'top': s.top+'%', 'left': s.left+'%', 'width': s.size+'%'}}></span>) : ""}
