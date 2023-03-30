@@ -72,7 +72,7 @@ function Connect() {
   return (
     <div className="App">
       <div><button onClick={ConnectToBluetooth}>Connect to Bluetooth</button></div>
-      <div><textarea value={script} cols="20" rows="20"></textarea></div>
+      <div><textarea value={script} onChange={e=>setScript(e.target.value)} cols="20" rows="20"></textarea></div>
       <div><button onClick={SendScript}>Send</button></div>
     </div>
   )
