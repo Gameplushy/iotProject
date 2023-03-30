@@ -80,6 +80,10 @@ function Connect() {
       alert("Bad parsing. Each line must be \"[LED ID] [START TIME] [END TIME]\"")
       return;
     }
+    if(size.length>50){
+      alert("Max limit hit (50)")
+      return;
+    }
     var oneline = script.replaceAll(/\r\n|\r|\n/g,";")
     Flash()
     Gantt()
