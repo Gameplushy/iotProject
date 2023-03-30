@@ -4,6 +4,9 @@ import './App.css'
 function App() {
   const [script, setScript] = useState("")
   const [bluetoothDevice, setBluetoothDevice] = useState(null)
+  const [ledToggler1,toggleLed1] = useState("")
+  const [ledToggler2,toggleLed2] = useState("")
+  const [ledToggler3,toggleLed3] = useState("")
 
   function ConnectToBluetooth(){
     if (!('bluetooth' in navigator)) {
@@ -67,25 +70,43 @@ function Connect() {
     //   alert("No Bluetooth device connected")
     //   return;
     // }
-    //script.match(/(([1-3]O([n]|f{2}))|(SLEEP(\d+)))/gim)
     if(!script)
       return;
     console.log(script)
     var verif = script.match(/^[1-3] \d+ \d+$/gim)
     var size = script.split(/\r\n|\r|\n/)
     if(!verif || verif.length != size.length){
-      alert("Bad parsing")
+      alert("Bad parsing. Each line must be \"[LED ID] [START TIME] [END TIME]\"")
       return;
     }
-    var oneline = script.replace(/\r\n|\r|\n/,";")
+    var oneline = script.replaceAll(/\r\n|\r|\n/g,";")
     console.log(oneline)
+    Flash()
     //ENVOYER ONELINE
+  }
+
+  function Flash(){
+    var flashFunctions = [toggleLed1,toggleLed2,toggleLed3]
+    script.split(/\r\n|\r|\n/).forEach(flash=>{
+      var flashArray = flash.split(" ");
+      setTimeout(() => {
+        flashFunctions[flashArray[0]-1]("ledon");
+        setTimeout(() => {
+          flashFunctions[flashArray[0]-1]("");
+        }, flashArray[2]-flashArray[1]);
+      }, flashArray[1]);
+    })
   }
 
   return (
     <div className="App">
       <div><button onClick={ConnectToBluetooth}>Connect to Bluetooth</button></div>
       <div><textarea value={script} onChange={e=>setScript(e.target.value)} cols="20" rows="20"></textarea></div>
+      <div id="ledrow">
+        <span className={"led "+ledToggler1}>1</span>
+        <span className={"led "+ledToggler2}>2</span>
+        <span className={"led "+ledToggler3}>3</span>
+      </div>
       <div><button onClick={SendScript}>Send</button></div>
     </div>
   )
