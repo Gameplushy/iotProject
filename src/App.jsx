@@ -93,8 +93,6 @@ function App() {
       }).then((res) => {
         res.writeValue(Buffer.from(oneline, 'utf-8'))
       })
-    /*console.log(Buffer.from(oneline, 'utf-8'))
-    bluetoothDevice.writeValue(Buffer.from(oneline, 'utf-8'))*/
   }
 
   function SendMorse(){
@@ -166,7 +164,6 @@ function App() {
       value.top = ((cmd[0]) - 1) * (100 / 3)
       value.left = (((cmd[1]) / endTime) * 100)
       value.size = (((cmd[2] - cmd[1]) / endTime) * 100)
-      //var value = "{top : "+top+"%; left : "+left+"%; width : "+size+"%}"
       setSpans(ganttSpans => [...ganttSpans, value])
     })
   }
@@ -182,7 +179,6 @@ function App() {
       value.top = ((cmd[0])-1)*(100/3)
       value.left = (((cmd[1])/endTime)*100)
       value.size = (((cmd[2]-cmd[1])/endTime)*100)
-      //var value = "{top : "+top+"%; left : "+left+"%; width : "+size+"%}"
       setSpans(ganttSpans=>[...ganttSpans,value])
     })
   }
