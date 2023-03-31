@@ -40,9 +40,9 @@ function App() {
     "Y":"-.--",
     "Z":"--.."
   }
-  const MORSEDOT = 100
-  const MORSEDASH = 300
-  const MORSEBREAK = 100
+  const MORSEDOT = 250
+  const MORSEDASH = MORSEDOT*3
+  const MORSEBREAK = MORSEDOT
 
   function ConnectToBluetooth() {
     if (!('bluetooth' in navigator)) {
@@ -96,11 +96,11 @@ function App() {
   }
 
   function SendMorse(){
-    if(!morsePlainText)
+    if(!morsePlainText || !morsePlainText.match("^[A-Za-z]+$"))
       return;
+    var commands = "";
     if(morsePlainText.length==3){
       var array = morsePlainText.toUpperCase().split('')
-      var commands = "";
       for (let i = 0; i < array.length; i++) {
         const c = array[i];
         var j = i+1;
@@ -114,10 +114,23 @@ function App() {
           commands+=line
         })
       }
-      commands = commands.substring(0,commands.length-2)
-      MorseFlash(commands)
-      MorseGantt(commands)
     }
+    else{
+      var timer = 0;
+      morsePlainText.toUpperCase().split('').forEach(c=>{
+        var code = morseDic[c];     
+        code.split('').forEach(d=>{
+          [3,2,1].forEach(n=>{
+            commands+=n+" "+(timer+(MORSEDOT*(3-n)))+" "+((timer+((d=='.')?MORSEDOT:MORSEDASH))+(MORSEDOT*(3-n)))+"\r\n"
+          })
+          timer+=((d=='.')?MORSEDOT:MORSEDASH)+MORSEBREAK
+        })
+         timer+=MORSEDOT;
+      })
+    }
+    commands = commands.substring(0,commands.length-2)
+    MorseFlash(commands)
+    MorseGantt(commands)
   }
 
   function Flash(){
