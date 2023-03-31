@@ -113,6 +113,7 @@ function App() {
       .then(async (res) => {
         return await res?.getCharacteristic("beb5483e-36e1-4688-b7f5-ea07361b26a8")
       }).then((res) => {
+        console.log(instruction)
         res.writeValue(Buffer.from(instruction, 'utf-8'))
       })
   }
