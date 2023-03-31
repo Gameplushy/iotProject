@@ -62,7 +62,8 @@ function App() {
       .catch((err) => {
         console.log('an error occured : ' + err.message)
       })
-
+  }
+  
   async function SendScript() {
     if (!bluetoothDevice) {
       alert("No Bluetooth device connected")
@@ -205,6 +206,5 @@ function App() {
       </div>
     </div>
   )
-}
 }
 export default App
