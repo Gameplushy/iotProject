@@ -87,11 +87,33 @@ function App() {
     Gantt()
     //ENVOYER ONELINE
     console.log(bluetoothDevice)
+    //Send(oneline)
+    SendInfo(oneline)
+  }
+
+  async function SendInfo(line){
+    //var flashFunctions = [toggleLed1,toggleLed2,toggleLed3]
+    var numberOfFlashAsks = [0,0,0]
+    line.split(/\r\n|\r|\n/).forEach(flash=>{
+      var flashArray = flash.split(" ");
+      setTimeout(() => {
+        numberOfFlashAsks[flashArray[0]]++
+        if(numberOfFlashAsks[flashArray[0]]==1) Send(flashArray[0]+" 1")//flashFunctions[flashArray[0]]("ledon");
+        setTimeout(() => {
+          numberOfFlashAsks[flashArray[0]]--
+          if(numberOfFlashAsks[flashArray[0]]==0) Send(flashArray[0]+" 0")//flashFunctions[flashArray[0]]("");
+        }, flashArray[2]-flashArray[1]);
+      }, flashArray[1]);
+    })
+
+  }
+
+  async function Send(instruction){
     await bluetoothDevice?.getPrimaryService("4fafc201-1fb5-459e-8fcc-c5c9c331914b")
       .then(async (res) => {
         return await res?.getCharacteristic("beb5483e-36e1-4688-b7f5-ea07361b26a8")
       }).then((res) => {
-        res.writeValue(Buffer.from(oneline, 'utf-8'))
+        res.writeValue(Buffer.from(instruction, 'utf-8'))
       })
   }
 
