@@ -114,23 +114,34 @@ function App() {
           commands+=line
         })
       }
+      commands = commands.substring(0,commands.length-2)
+      MorseFlash(commands)
+      MorseGantt(commands)
     }
     else{
-      var timer = 0;
-      morsePlainText.toUpperCase().split('').forEach(c=>{
-        var code = morseDic[c];     
-        code.split('').forEach(d=>{
-          [3,2,1].forEach(n=>{
-            commands+=n+" "+(timer+(MORSEDOT*(3-n)))+" "+((timer+((d=='.')?MORSEDOT:MORSEDASH))+(MORSEDOT*(3-n)))+"\r\n"
-          })
-          timer+=((d=='.')?MORSEDOT:MORSEDASH)+MORSEBREAK
-        })
-         timer+=MORSEDOT;
-      })
+      alert("Only 3 letter-words !")
+      return;
     }
-    commands = commands.substring(0,commands.length-2)
-    MorseFlash(commands)
-    MorseGantt(commands)
+  }
+
+  function SendMarquee(){
+    if(!morsePlainText || !morsePlainText.match("^[A-Za-z]+$"))
+    return;
+  var commands = "";
+  var timer = 0;
+  morsePlainText.toUpperCase().split('').forEach(c=>{
+    var code = morseDic[c];     
+    code.split('').forEach(d=>{
+      [3,2,1].forEach(n=>{
+        commands+=n+" "+(timer+(MORSEDOT*(3-n)))+" "+((timer+((d=='.')?MORSEDOT:MORSEDASH))+(MORSEDOT*(3-n)))+"\r\n"
+      })
+      timer+=((d=='.')?MORSEDOT:MORSEDASH)+MORSEBREAK
+    })
+     timer+=MORSEBREAK;
+  })
+  commands = commands.substring(0,commands.length-2)
+  MorseFlash(commands)
+  MorseGantt(commands)
   }
 
   function Flash(){
@@ -211,7 +222,8 @@ function App() {
       </div>
       <div>
         <button onClick={SendScript}>Send script</button>
-        <button onClick={SendMorse}>Send Morse</button>
+        <button onClick={SendMorse}>Send Simultaneous Morse</button>
+        <button onClick={SendMarquee}>Send Marquee Morse</button>
       </div>
     </div>
   )
