@@ -83,12 +83,13 @@ function App() {
     }
     var oneline = script.replaceAll(/\r\n|\r|\n/g, ";")
     console.log(oneline)
+    SendInfo(oneline)
     Flash()
     Gantt()
     //ENVOYER ONELINE
     console.log(bluetoothDevice)
     //Send(oneline)
-    SendInfo(oneline)
+    
   }
 
   async function SendInfo(line){
@@ -138,6 +139,9 @@ function App() {
         })
       }
       commands = commands.substring(0,commands.length-2)
+      var oneline = script.replaceAll(/\r\n|\r|\n/g, ";")
+      console.log(oneline)
+      SendInfo(oneline)
       MorseFlash(commands)
       MorseGantt(commands)
     }
@@ -163,6 +167,9 @@ function App() {
      timer+=MORSEBREAK;
   })
   commands = commands.substring(0,commands.length-2)
+  var oneline = script.replaceAll(/\r\n|\r|\n/g, ";")
+  console.log(oneline)
+  SendInfo(oneline)
   MorseFlash(commands)
   MorseGantt(commands)
   }
